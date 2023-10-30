@@ -1,3 +1,4 @@
+import copy
 from skimage.morphology import skeletonize
 from skimage.transform import rescale, resize, downscale_local_mean
 from skimage import data
@@ -58,7 +59,17 @@ for r in range(skeleton.shape[0]):
                 if skeleton[i][j] == True:
                     to_search.add(pixel)
                     shape_lookup[pixel] = shape_number
+    
 
+shapes = list()
+for shape_number in set(shape_lookup.values()):
+    this_shape = copy.deepcopy(skeleton)
+    for pixel, pixel_parent in shape_lookup.items():
+        i, j = pixel
+        if shape_number != pixel_parent:
+            this_shape[i][j] = False 
+    
+    shapes.append(this_shape)
 
 # display results
 fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(8, 4),
@@ -74,5 +85,27 @@ ax[1].imshow(skeleton, cmap=plt.cm.gray)
 ax[1].axis('off')
 ax[1].set_title('skeleton', fontsize=20)
 
+
 fig.tight_layout()
+breakpoint()
 plt.show()
+
+breakpoint()
+
+for shape in shapes:
+    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(8, 4),
+                            sharex=True, sharey=True)
+
+    ax = axes.ravel()
+
+    ax[1].imshow(shape, cmap=plt.cm.gray)
+    ax[1].axis('off')
+    ax[1].set_title('skeleton', fontsize=20)
+
+    ax[0].imshow(image, cmap=plt.cm.gray)
+    ax[0].axis('off')
+    ax[0].set_title('original', fontsize=20)
+
+    fig.tight_layout()
+    plt.show()
+    breakpoint()
